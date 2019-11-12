@@ -24,21 +24,29 @@ const AppStack = createStackNavigator({
   Home: HomeScreen,
   Chat:ChatScreen,
   Profile:ProfileScreen,
-  Register:RegisterScreen
-});
-const AuthStack = createStackNavigator({ 
-  Login: LoginScreen 
 });
 
-export default createAppContainer(
-  createSwitchNavigator(
-    {
-      AuthLoading: AuthLoadingScreen,
-      App: AppStack,
-      Auth: AuthStack,
-    },
-    {
-      initialRouteName: 'AuthLoading',
-    }
-  )
+const AuthStack = createStackNavigator({ 
+  Login: LoginScreen, 
+  Register:RegisterScreen,
+  },{
+    defaultNavigationOptions: {
+      header: null
+    } 
+  }
+  );
+
+const Router= createSwitchNavigator(
+  {
+    AuthLoading: AuthLoadingScreen,
+    App: AppStack,
+    Auth: AuthStack,
+  },
+  {
+    initialRouteName: 'AuthLoading',
+  }
 );
+
+
+export default createAppContainer(Router);
+
