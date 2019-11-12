@@ -9,7 +9,7 @@ import {
 import User from '../../User';
 import styles from '../constants/styles';
 import { TextInput  } from 'react-native-gesture-handler';
-import fireabse from 'firebase'; 
+import firebase from 'firebase'; 
 import AsyncStorage from '@react-native-community/async-storage';
 
 ProfileScreen.navigationOptions={
@@ -17,7 +17,7 @@ ProfileScreen.navigationOptions={
 }
 
 export default function ProfileScreen(props) {
-    const [input, setInput]=useState({name:User.name})
+    const [input, setInput]=useState({name:''})
 
     const handleChange=key=>val=>{
         setInput({...input,[key]:val});
@@ -36,18 +36,25 @@ export default function ProfileScreen(props) {
     }
 
     const deleteToken = async () => {
-        await AsyncStorage.removeItem('userPhone')
+        await AsyncStorage.clear();
+        firebase.auth().signOut();
         props.navigation.navigate('Auth')
     }
 
-    // const _logOut=async()=>{
-    //     await AsyncStorage.clear();
-    //     props.navigation.navigate('Auth');
-    // }
+    useEffect(()=>{
+        AsyncStorage.getItem('name').then(val=>{
+            if(val){
+            setInput({...input, name:val })
+            }
+        }
+        )
+    },[])
+    // const name = AsyncStorage.getItem('name');
+    console.log("NAMA Profile",input.name)
     return(
         <SafeAreaView style={styles.container}>
-            <Text>
-                {User.phone}
+            <Text style={styles.btnText}>
+                {input.name}
             </Text>
             <TextInput
                 style={styles.input}

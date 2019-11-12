@@ -3,9 +3,10 @@ import {View,Dimensions,Text,SafeAreaView,TextInput,TouchableOpacity} from 'reac
 import AuthLoadingScreen from './AuthLoadingScreen';
 import styles from '../constants/styles'
 import User from '../../User';
-import firebase from 'firebase';
 import { FlatList } from 'react-native-gesture-handler';
-
+import {Auth,Db} from '../Config/Config';
+import firebase from 'firebase';
+import AsyncStorage from '@react-native-community/async-storage';
 
 ChatScreen.navigationOptions=({navigation})=>{
     return{
@@ -17,23 +18,33 @@ export default function ChatScreen(props) {
     // const [Message, setMessage] = useState({ textMessage: ''});
     const [person, setPerson]=useState({
         name:props.navigation.getParam('name'),
-        phone:props.navigation.getParam('phone'),
+        id:props.navigation.getParam('id'),
         textMessage: ''
     })
 
     const [message,setMessageList]=useState({
         messageList:[]
     })
+    console.log('DATA PROPS',User.id)
 
-    useEffect(()=>{
-        firebase.database().ref('messages').child(User.phone).child(person.phone)
+    const getMessage=async()=>{
+        const name = await AsyncStorage.getItem('name');
+        firebase.database().ref('messages')
+        .child(name)
+        .child(person.name)
             .on('child_added',(value)=>{
                 setMessageList((prevState)=>{
-                    return{
-                        messageList:[...prevState.messageList,value.val()]
-                    }
-                })
+                return{
+                    messageList:[...prevState.messageList,value.val()]
+                }
             })
+        })
+    }
+
+    console.log("LIST PESAN", message)
+
+    useEffect(()=>{
+        getMessage()
     },[])
 
    const handleChange=key=>val=>{
@@ -51,17 +62,18 @@ export default function ChatScreen(props) {
         return result;
     }
 
-    sendMessage=async()=>{
+    const sendMessage=async()=>{
+        const name = await AsyncStorage.getItem('name');
         if(person.textMessage.length>0){
-            let msgId=firebase.database().ref('message').child(User.phone).child(person.phone).push().key;
+            let msgId=firebase.database().ref('message').child(name).child(person.name).push().key;
             let updates={};
             let message={
                 message:person.textMessage,
                 time:firebase.database.ServerValue.TIMESTAMP,
-                from:User.phone
+                from:person.name
             }
-            updates['messages/'+User.phone+'/'+person.phone+'/'+msgId]=message;
-            updates['messages/'+person.phone+'/'+ person.phone+'/'+msgId]=message;
+            updates['messages/'+name+'/'+person.name+'/'+msgId]=message;
+            updates['messages/'+person.name+'/'+ name+'/'+msgId]=message;
             firebase.database().ref().update(updates);
             // setPerson({textMessage:''});
             setPerson({ ...person, textMessage: '' });
@@ -70,12 +82,13 @@ export default function ChatScreen(props) {
 
     console.log(person)
     renderRow=({item})=>{
+        const name = AsyncStorage.getItem('name');
         return(
             <View style={{
                 flexDirection:'row',
                 width:'60%',
-                alignSelf:item.from==User.phone?'flex-end':'flex-start',
-                backgroundColor:item.from===User.phone?'#00897b':'#7cb324',
+                alignSelf:item.from==person.name?'flex-end':'flex-start',
+                backgroundColor:item.from===person.name?'#00897b':'#7cb324',
                 borderRadius:5,
                 marginBottom:10 
             }}>

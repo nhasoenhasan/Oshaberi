@@ -12,6 +12,7 @@ import User from '../../User';
 import styles from '../constants/styles'; 
 import AsyncStorage from '@react-native-community/async-storage';
 import firebase from 'firebase';
+import {Auth,Db} from '../Config/Config';
 
     HomeScreen.navigationOptions=({navigation})=>{
         return{
@@ -28,7 +29,10 @@ import firebase from 'firebase';
 
 export default function HomeScreen(props) {
 
-    const [users, setUsers] = useState({ users: ""});
+    const [users, setUsers] = useState({ 
+        userslist: [],
+        id: '',
+    });
 
     const styles = StyleSheet.create({
         container:{
@@ -38,28 +42,28 @@ export default function HomeScreen(props) {
         },
     }); 
 
-    useEffect(()=>{
-        let dbref=firebase.database().ref('users');
-        dbref.on('child_added',(val)=>{
-            let person =val.val();
-            person.phone=val.key;
-            if(person.phone===User.phone){
-                User.name=person.name
-            }else{
-                setUsers((prevState)=>{
-                    return{
-                        users:[...prevState.users,person]
-                    }
-                })
-            }
-        })
+   
+    //Get All Users
+    const getAllUser = async() => {
+        const value = await AsyncStorage.getItem('id');
+
+        Db.ref('users').on('value', result => {
+          let data = result.val();
+          if (data !== null) {
+            let allusers = Object.values(data);
+            const filteredUser = allusers.filter(
+                user => user.id !== value,
+            );
+             setUsers({users,userslist:filteredUser});
+          }
+
+        });
+    };
+
+    //Action Get All Users
+    useEffect( ()=>{
+        getAllUser()
     },[])
-
-    const _logOut=async()=>{
-        await AsyncStorage.clear();
-        props.navigation.navigate('Auth');
-    }
-
 
     renderRow =({item})=>{
         return(
@@ -73,12 +77,13 @@ export default function HomeScreen(props) {
         )
     }
 
+    
     return(
         <SafeAreaView>
             <FlatList
-                data={users.users}
+                data={users.userslist}
                 renderItem={renderRow}
-                keyExtractor={(item)=>item.phone}
+                keyExtractor={(item)=>item.id}
             />
         </SafeAreaView>
     )
