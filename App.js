@@ -12,13 +12,14 @@ import AsyncStorage from '@react-native-community/async-storage';
 import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import AuthLoadingScreen from './src/screens/AuthLoadingScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import ChatScreen from './src/screens/ChatScreen';
 
 
-const AppStack = createStackNavigator({ Home: HomeScreen,Chat:ChatScreen});
+const AppStack = createStackNavigator({ Home: HomeScreen,Chat:ChatScreen,Profile:ProfileScreen});
 const AuthStack = createStackNavigator({ Login: LoginScreen });
 
 export default createAppContainer(

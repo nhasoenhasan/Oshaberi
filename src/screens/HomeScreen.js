@@ -5,15 +5,25 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
-  SafeAreaView 
+  SafeAreaView ,
+  Image
 } from 'react-native';
 import User from '../../User';
 import styles from '../constants/styles'; 
 import AsyncStorage from '@react-native-community/async-storage';
 import firebase from 'firebase';
 
-    HomeScreen.navigationOptions={
-        title:'Chats'
+    HomeScreen.navigationOptions=({navigation})=>{
+        return{
+            title:'Chats',
+            headerRight:(
+                <TouchableOpacity onPress={()=>navigation.navigate('Profile')}>
+                    <Image source={{uri:'https://instagram.fjog3-1.fna.fbcdn.net/vp/244d4d9ec903d34fcadd4b0b2f9a09eb/5E5CAC06/t51.2885-15/sh0.08/e35/s640x640/74661227_136879711053702_8974505103939330289_n.jpg?_nc_ht=instagram.fjog3-1.fna.fbcdn.net&_nc_cat=106'}} 
+                    style={{width:32,height:32,marginRight:7}}/>
+                </TouchableOpacity>
+            )
+
+        }
     }
 
 export default function HomeScreen(props) {
@@ -33,11 +43,15 @@ export default function HomeScreen(props) {
         dbref.on('child_added',(val)=>{
             let person =val.val();
             person.phone=val.key;
-            setUsers((prevState)=>{
-                return{
-                    users:[...prevState.users,person]
-                }
-            })
+            if(person.phone===User.phone){
+                User.name=person.name
+            }else{
+                setUsers((prevState)=>{
+                    return{
+                        users:[...prevState.users,person]
+                    }
+                })
+            }
         })
     },[])
 
