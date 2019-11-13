@@ -18,7 +18,14 @@ const styles=StyleSheet.create({
       btnText:{
         color:'darkblue',
         fontSize:20
-      }
+      },
+      // Signin
+      containerSignin:{
+        flex:1,
+        backgroundColor:'white',
+        padding:40
+      },
+      
 })
 
 export default styles;

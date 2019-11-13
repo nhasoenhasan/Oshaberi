@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Image
   // AsyncStorage
 } from 'react-native';
 import User from '../../User';
@@ -13,12 +14,10 @@ import AsyncStorage from '@react-native-community/async-storage';
 import styles from '../constants/styles';
 import firebase from 'firebase';
 import {Auth,Db} from '../Config/Config';
+import logo from '../assets/image/LogoOshaburi.png';
+import {Form, Thumbnail,Item, Input, Label,Button,Toast } from 'native-base';
 
 export default function LoginScreen(props) {
-  
-  // LoginScreen.navigationOptions=({navigation})=>({
-  //   header:null
-  // });
 
   const [input, setInput] = useState({ email: "", password: ""});
 
@@ -26,35 +25,12 @@ export default function LoginScreen(props) {
     setInput({...input,[key]:val}); 
   }
 
-  // useEffect(()=>{
-  //   AsyncStorage.getItem('userPhone').then(val=>{
-  //       if(val){
-  //         setInput({...input, phone:val })
-  //       }
-  //     }
-  //   )
-  // },[])
-
-  // const submitForm =async () =>{
-  //   if(input.phone.length < 10){
-  //     Alert.alert('Error','Wrong Phone')
-  //   }else if(input.name.length<3){
-  //     Alert.alert('Error','Wrong Name')
-  //   }else{
-  //     await AsyncStorage.setItem('userPhone',input.phone)
-  //     firebase.database().ref('users/'+input.phone).set({name:input.name});
-  //     User.phone=input.phone
-  //     props.navigation.navigate('App');
-  //   }
-  // }
-
   const handleSubmit =async () =>{
     Auth.signInWithEmailAndPassword(input.email.trim(), input.password)
       .then(async result => {
         await Db.ref('users/' + result.user.uid).update({
           status: 'online',
         });
-
         try {
           await AsyncStorage.setItem('id', result.user.uid);
           await AsyncStorage.setItem('userPhone',result.user.uid)
@@ -69,38 +45,55 @@ export default function LoginScreen(props) {
         props.navigation.navigate('App');
       })
       .catch(error => {
-      console.log(error);
+        Toast.show({
+          text: error.message,
+          buttonText: "Okay",
+          type: "danger"
+        })
     });
 
   }
 
-  console.log(input)
-
   return(
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Email....."
-        style={styles.input}
-        value={input.email}
-        onChangeText={handleChange('email')}
-      />
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        value={input.password}
-        onChangeText={handleChange('password')}
-      />
-      <TouchableOpacity style={{marginBottom:20}}>
-        <Text style={styles.btnText} onPress={handleSubmit}>
-          Login
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={()=>props.navigation.navigate('Register')}>
-        <Text style={styles.btnText}>
-          Register
-        </Text>
-      </TouchableOpacity>
-
+    <View style={styles.containerSignin}>
+    <Form>
+      <View style={{alignItems:'center'}}>
+        <Thumbnail  source={logo} style={{width:200,height:150}} />
+        <Text style={{fontSize:30,fontWeight:'bold',color:'#ff826e'}}>
+              Oshabiru
+            </Text>
+            <Text style={{fontSize:20,fontWeight:'bold',color:'#ffc05f'}}>
+              オシャビル
+            </Text>
+      </View>
+      <Item floatingLabel >
+        <Label>Email</Label>
+        <Input 
+          value={input.email}
+          onChangeText={handleChange('email')}
+        />
+      </Item>
+      <Item floatingLabel style={{marginBottom:8}}>
+        <Label>Password</Label>
+        <Input 
+          placeholder="Email....."
+          value={input.password}
+          onChangeText={handleChange('password')}
+          secureTextEntry={true}
+        />
+      </Item>
+        <Button  onPress={handleSubmit} style={{backgroundColor:'#ff826e',justifyContent:'center',marginTop:20,
+        alignItems:'center',}}>
+          <Text style={{fontWeight:'bold'}}>Sign in</Text>
+        </Button>
+        <View style={{alignItems:'center'}}>
+          <TouchableOpacity onPress={()=>props.navigation.navigate('Register')}>
+            <Text style={{fontSize:15,marginTop:30}}>
+              Don't have any account?<Text style={{fontWeight:'bold',color:'#ffc05f'}}> Register</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Form>
     </View>
   )
 
