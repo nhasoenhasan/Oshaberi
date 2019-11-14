@@ -18,7 +18,7 @@ import logo from '../assets/image/LogoOshaburi.png';
 import {Form, Thumbnail,Item, Input, Label,Button,Toast } from 'native-base';
 
 export default function LoginScreen(props) {
-
+  
   const [input, setInput] = useState({ email: "", password: ""});
 
   const handleChange = key => val =>{
@@ -26,23 +26,25 @@ export default function LoginScreen(props) {
   }
 
   const handleSubmit =async () =>{
-    Auth.signInWithEmailAndPassword(input.email.trim(), input.password)
+      Auth.signInWithEmailAndPassword(input.email.trim(), input.password)
       .then(async result => {
-        await Db.ref('users/' + result.user.uid).update({
+        await Db.ref('users/' + result.user.displayName).update({
           status: 'online',
         });
-        try {
-          await AsyncStorage.setItem('id', result.user.uid);
-          await AsyncStorage.setItem('userPhone',result.user.uid)
-          await AsyncStorage.setItem('name', result.user.displayName);
-          await AsyncStorage.setItem('email', result.user.email);
-          User.email== result.user.email;
-          User.id==result.user.uid
-        } catch (e) {
-          // saving error
-          console.log(e);
-        }
-        props.navigation.navigate('App');
+          
+          try {
+            await AsyncStorage.setItem('id', result.user.uid);
+            await AsyncStorage.setItem('userPhone',result.user.uid)
+            await AsyncStorage.setItem('name', result.user.displayName);
+            await AsyncStorage.setItem('email', result.user.email);
+            User.name=input.name;
+            User.email = result.user.email;
+            User.id=result.user.uid;
+          } catch (e) {
+            // saving error
+            console.log(e);
+          }
+         props.navigation.navigate('App');
       })
       .catch(error => {
         Toast.show({
@@ -50,8 +52,7 @@ export default function LoginScreen(props) {
           buttonText: "Okay",
           type: "danger"
         })
-    });
-
+      });
   }
 
   return(

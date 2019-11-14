@@ -19,13 +19,14 @@ ProfileScreen.navigationOptions={
 export default function ProfileScreen(props) {
     const [input, setInput]=useState({name:''})
 
+    
+
     const handleChange=key=>val=>{
         setInput({...input,[key]:val});
     }
 
-    console.log(input)
+ 
     const changeName= async()=>{
-        console.log("Hai")
         if(input.name.lenght < 3){
             Alert.alert('Error','Please Enter')
         }else if(User.name !== input.name){
@@ -42,15 +43,17 @@ export default function ProfileScreen(props) {
     }
 
     useEffect(()=>{
-        AsyncStorage.getItem('name').then(val=>{
-            if(val){
-            setInput({...input, name:val })
+        const promises =Promise.all([
+            AsyncStorage.getItem('name')
+        ]);
+        promises.then(([name])=>{
+            if(name){
+                setInput({...input,name:name})
             }
-        }
-        )
+        });
     },[])
+    console.log(input)
     // const name = AsyncStorage.getItem('name');
-    console.log("NAMA Profile",input.name)
     return(
         <SafeAreaView style={styles.container}>
             <Text style={styles.btnText}>

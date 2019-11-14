@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from 'react';
-import {View,Dimensions,Text,SafeAreaView,TextInput,TouchableOpacity} from 'react-native';
+import {View,Dimensions,Text,SafeAreaView,TextInput,TouchableOpacity,KeyboardAvoidingView} from 'react-native';
 import AuthLoadingScreen from './AuthLoadingScreen';
 import styles from '../constants/styles'
 import User from '../../User';
@@ -7,6 +7,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import {Auth,Db} from '../Config/Config';
 import firebase from 'firebase';
 import AsyncStorage from '@react-native-community/async-storage';
+import {Item, Input } from 'native-base';
 
 ChatScreen.navigationOptions=({navigation})=>{
     return{
@@ -25,7 +26,6 @@ export default function ChatScreen(props) {
     const [message,setMessageList]=useState({
         messageList:[]
     })
-    console.log('DATA PROPS',User.id)
 
     const getMessage=async()=>{
         const name = await AsyncStorage.getItem('name');
@@ -41,7 +41,6 @@ export default function ChatScreen(props) {
         })
     }
 
-    console.log("LIST PESAN", message)
 
     useEffect(()=>{
         getMessage()
@@ -80,7 +79,6 @@ export default function ChatScreen(props) {
         }
     }
 
-    console.log(person)
     renderRow=({item})=>{
         const name = AsyncStorage.getItem('name');
         return(
@@ -106,14 +104,15 @@ export default function ChatScreen(props) {
     return(
         <SafeAreaView>
             <FlatList
-                style={{padding:10,height:height*0.8}}
+                style={{padding:10,height:height*0.80 }}
                 data={message.messageList}
                 renderItem={renderRow}
                 keyExtractor={(item, index)=>index.toString()}
             />
+             
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <TextInput
-                    style={styles.input}
+                <Item last>
+                <Input placeholder="Password" 
                     value={person.textMessage}
                     onChangeText={handleChange('textMessage')}
                 />
@@ -122,6 +121,7 @@ export default function ChatScreen(props) {
                         Send
                     </Text>
                 </TouchableOpacity>
+                </Item>
             </View>
         </SafeAreaView>
     )

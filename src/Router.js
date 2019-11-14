@@ -14,17 +14,25 @@ import HomeScreen from './screens/HomeScreen';
 import AuthLoadingScreen from './screens/AuthLoadingScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import RegisterScreen from './screens/RegisterScreen';
-
+import ChatScreen from './screens/ChatScreen';
+import MapsScreen from './screens/MapsScreen';
+import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
-import ChatScreen from './screens/ChatScreen';
+import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
 
-
-const AppStack = createStackNavigator({ 
+const DashboardTabNavigator = createMaterialTopTabNavigator({
   Home: HomeScreen,
-  Chat:ChatScreen,
+  Maps:MapsScreen,
   Profile:ProfileScreen,
 });
+
+const AppStack = createStackNavigator({ 
+  DashboardTabNavigator,
+  Chat: ChatScreen,
+});
+
+
 
 const AuthStack = createStackNavigator({ 
   Login: LoginScreen, 

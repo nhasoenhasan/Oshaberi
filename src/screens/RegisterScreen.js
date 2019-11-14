@@ -54,7 +54,7 @@ export default function RegisterScreen(props) {
             }
            
             //INSERT DATABASE USER
-            await Db.ref('users/' + result.user.uid)
+            await Db.ref('users/' + input.name)
             .set({
                 id: result.user.uid,
                 name: input.name,
