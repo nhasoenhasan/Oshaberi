@@ -80,6 +80,8 @@ project.ext.react = [
     enableHermes: false,  // clean and rebuild if changing
 ]
 
+
+
 apply from: "../../node_modules/react-native/react.gradle"
 
 /**
@@ -181,7 +183,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
-
+    compile project(':react-native-maps') 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")
@@ -196,6 +198,16 @@ dependencies {
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
+}
+
+ext {
+    buildToolsVersion = "27.0.3"
+    minSdkVersion = 16
+    compileSdkVersion = 27
+    targetSdkVersion = 26
+    supportLibVersion = "27.1.1"
+    googlePlayServicesVersion = "15.0.1"
+    androidMapsUtilsVersion = "0.5+"
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
