@@ -14,6 +14,7 @@ import styles from '../constants/styles';
 import firebase from 'firebase';
 import logo from '../assets/image/LogoOshaburi.png';
 import {Form, Item, Input, Label,Button,Thumbnail,Toast } from 'native-base';
+import Geolocation from 'react-native-geolocation-service';
 
 export default function RegisterScreen(props) {
   
@@ -22,7 +23,9 @@ export default function RegisterScreen(props) {
       name: "", 
       email: "",
       password:"",
-      errorMessage: null
+      errorMessage: null,
+      latitude:"",
+      longitude:""
     });
 
     const handleChange = key => val =>{
@@ -38,8 +41,6 @@ export default function RegisterScreen(props) {
             await userPro.updateProfile({
                 displayName:input.name,
             });
-            
-            console.log("SET ASYNC STORAGE",result)
 
             try {
               await AsyncStorage.setItem('id', result.user.uid);
@@ -60,6 +61,8 @@ export default function RegisterScreen(props) {
                 name: input.name,
                 email: input.email,
                 password: input.password,
+                latitude:input.longitude,
+                longitude:input.longitude
             })
             .then(async() => {
               props.navigation.navigate('Home');
@@ -74,6 +77,55 @@ export default function RegisterScreen(props) {
           })
         );
   }
+
+  // GET LOCATION PERMISSIONS //
+  const hasLocationPermission = async () => {
+    if (
+    Platform.OS === 'ios' ||
+    (Platform.OS === 'android' && Platform.Version < 23)
+    ) {
+    return true;
+    }
+    const hasPermission = await PermissionsAndroid.check(
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (hasPermission) {
+    return true;
+    }
+    const status = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (status === PermissionsAndroid.RESULTS.GRANTED) {
+    return true;
+    }
+    if (status === PermissionsAndroid.RESULTS.DENIED) {
+    ToastAndroid.show(
+        'Location Permission Denied By User.',
+        ToastAndroid.LONG,
+    );
+    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+    ToastAndroid.show(
+        'Location Permission Revoked By User.',
+        ToastAndroid.LONG,
+    );
+    }
+    return false;
+};
+
+  useEffect( ()=>{
+    if (hasLocationPermission) {
+        Geolocation.getCurrentPosition(
+            (position) => {
+                setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
+            },
+            (error) => {
+                // See error code charts below.
+                console.log(error.code, error.message);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
+    }
+},[])
 
   return(
     <View style={{padding:40,paddingTop:20}}>

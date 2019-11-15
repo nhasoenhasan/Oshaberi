@@ -16,20 +16,24 @@ import firebase from 'firebase';
 import {Auth,Db} from '../Config/Config';
 import logo from '../assets/image/LogoOshaburi.png';
 import {Form, Thumbnail,Item, Input, Label,Button,Toast } from 'native-base';
+import Geolocation from 'react-native-geolocation-service';
 
 export default function LoginScreen(props) {
   
-  const [input, setInput] = useState({ email: "", password: ""});
+  const [input, setInput] = useState({ email: "", password: "",latitude:"",longitude:""});
 
   const handleChange = key => val =>{
     setInput({...input,[key]:val}); 
   }
 
   const handleSubmit =async () =>{
+      
       Auth.signInWithEmailAndPassword(input.email.trim(), input.password)
       .then(async result => {
         await Db.ref('users/' + result.user.displayName).update({
-          status: 'online',
+          status: 'Fucking Online',
+          latitude:input.longitude,
+          longitude:input.longitude
         });
           
           try {
@@ -55,6 +59,56 @@ export default function LoginScreen(props) {
       });
   }
 
+  // GET LOCATION PERMISSIONS //
+  const hasLocationPermission = async () => {
+    if (
+    Platform.OS === 'ios' ||
+    (Platform.OS === 'android' && Platform.Version < 23)
+    ) {
+    return true;
+    }
+    const hasPermission = await PermissionsAndroid.check(
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (hasPermission) {
+    return true;
+    }
+    const status = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (status === PermissionsAndroid.RESULTS.GRANTED) {
+    return true;
+    }
+    if (status === PermissionsAndroid.RESULTS.DENIED) {
+    ToastAndroid.show(
+        'Location Permission Denied By User.',
+        ToastAndroid.LONG,
+    );
+    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+    ToastAndroid.show(
+        'Location Permission Revoked By User.',
+        ToastAndroid.LONG,
+    );
+    }
+    return false;
+  };
+
+  useEffect( ()=>{
+    if (hasLocationPermission) {
+        Geolocation.getCurrentPosition(
+            (position) => {
+                setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
+            },
+            (error) => {
+                // See error code charts below.
+                console.log(error.code, error.message);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
+    }
+},[])
+
+console.log(input)
   return(
     <View style={styles.containerSignin}>
     <Form>
