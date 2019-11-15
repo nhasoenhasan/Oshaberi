@@ -1,4 +1,5 @@
 import React,{useState,useEffect} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   StyleSheet,
   View,
@@ -15,10 +16,10 @@ import firebase from 'firebase';
 import logo from '../assets/image/LogoOshaburi.png';
 import {Form, Item, Input, Label,Button,Thumbnail,Toast } from 'native-base';
 import Geolocation from 'react-native-geolocation-service';
+import { setUser } from '../Redux/actions/user';
+
 
 export default function RegisterScreen(props) {
-  
-
     const [input, setInput] = useState({ 
       name: "", 
       email: "",
@@ -27,6 +28,8 @@ export default function RegisterScreen(props) {
       latitude:"",
       longitude:""
     });
+    const isLoading = useSelector(state => state.loading.isLoading);
+    const dispatch = useDispatch();
 
     const handleChange = key => val =>{
         setInput({...input,[key]:val}); 
@@ -35,47 +38,42 @@ export default function RegisterScreen(props) {
     console.log(input)
 
   const submitForm =async () =>{
-    await Auth.createUserWithEmailAndPassword(input.email.trim(), input.password)
-        .then(async result => {
-            let userPro = Auth.currentUser;
-            await userPro.updateProfile({
-                displayName:input.name,
-            });
+    Auth.createUserWithEmailAndPassword(input.email.trim(), input.password)
+      .then(async result => {
 
-            try {
-              await AsyncStorage.setItem('id', result.user.uid);
-              await AsyncStorage.setItem('userPhone',result.user.uid)
-              await AsyncStorage.setItem('name', input.name);
-              await AsyncStorage.setItem('email', result.user.email);
-              User.email== result.user.email;
-              User.id==result.user.uid
-            } catch (e) {
-              // saving error
-              console.log(e);
-            }
-           
-            //INSERT DATABASE USER
-            await Db.ref('users/' + input.name)
-            .set({
-                id: result.user.uid,
-                name: input.name,
-                email: input.email,
-                password: input.password,
-                latitude:input.longitude,
-                longitude:input.longitude
-            })
-            .then(async() => {
-              props.navigation.navigate('Home');
-            });
-            
-        })
-        .catch(error => 
-          Toast.show({
-            text: error.message,
-            buttonText: "Okay",
-            type: "danger"
-          })
-        );
+        let userPro = Auth.currentUser;
+        await userPro.updateProfile({
+          displayName:input.name,
+        });
+
+        console.log("HAI")
+        dispatch(setUser(
+          result.user.uid, 
+          result.user.displayName,
+          result.user.email
+        ))
+
+        //INSERT DATABASE USER
+        await Db.ref('users/' + input.name)
+        .set({
+          id: result.user.uid,
+          name: input.name,
+          email: input.email,
+          password: input.password,
+          latitude:input.longitude,
+          longitude:input.longitude
+          })  
+         
+        props.navigation.navigate('App');
+      })
+      .catch(error => {
+        // Toast.show({
+        //   text: error.message,
+        //   buttonText: "Okay",
+        //   type: "danger"
+        // })
+        console.log(error)
+      });
   }
 
   // GET LOCATION PERMISSIONS //

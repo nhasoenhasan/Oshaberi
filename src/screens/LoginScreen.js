@@ -1,4 +1,5 @@
 import React,{useState,useEffect} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   StyleSheet,
   View,
@@ -7,7 +8,6 @@ import {
   TouchableOpacity,
   Alert,
   Image
-  // AsyncStorage
 } from 'react-native';
 import User from '../../User';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -15,40 +15,40 @@ import styles from '../constants/styles';
 import firebase from 'firebase';
 import {Auth,Db} from '../Config/Config';
 import logo from '../assets/image/LogoOshaburi.png';
-import {Form, Thumbnail,Item, Input, Label,Button,Toast } from 'native-base';
+import { setUser } from '../Redux/actions/user';
+import { setLoading } from '../Redux/actions/loading';
+import {Form, Thumbnail,Item, Input, Label,Button,Toast,Spinner } from 'native-base';
 import Geolocation from 'react-native-geolocation-service';
 
 export default function LoginScreen(props) {
   
   const [input, setInput] = useState({ email: "", password: "",latitude:"",longitude:""});
+  const isLoading = useSelector(state => state.loading.isLoading);
+  const dispatch = useDispatch();
 
   const handleChange = key => val =>{
     setInput({...input,[key]:val}); 
   }
 
   const handleSubmit =async () =>{
-      
+      dispatch(setLoading(true))
       Auth.signInWithEmailAndPassword(input.email.trim(), input.password)
       .then(async result => {
+    
         await Db.ref('users/' + result.user.displayName).update({
           status: 'Fucking Online',
           latitude:input.longitude,
           longitude:input.longitude
         });
+
+        Console.log("HAI")
+        dispatch(setUser(
+          result.user.uid, 
+          result.user.displayName,
+          result.user.email
+        ))
           
-          try {
-            await AsyncStorage.setItem('id', result.user.uid);
-            await AsyncStorage.setItem('userPhone',result.user.uid)
-            await AsyncStorage.setItem('name', result.user.displayName);
-            await AsyncStorage.setItem('email', result.user.email);
-            User.name=input.name;
-            User.email = result.user.email;
-            User.id=result.user.uid;
-          } catch (e) {
-            // saving error
-            console.log(e);
-          }
-         props.navigation.navigate('App');
+        props.navigation.navigate('App');
       })
       .catch(error => {
         Toast.show({
@@ -94,6 +94,7 @@ export default function LoginScreen(props) {
   };
 
   useEffect( ()=>{
+    dispatch(setLoading(false))
     if (hasLocationPermission) {
         Geolocation.getCurrentPosition(
             (position) => {
@@ -124,6 +125,7 @@ console.log(input)
       <Item floatingLabel >
         <Label>Email</Label>
         <Input 
+          disabled={isLoading}
           value={input.email}
           onChangeText={handleChange('email')}
         />
@@ -131,6 +133,7 @@ console.log(input)
       <Item floatingLabel style={{marginBottom:8}}>
         <Label>Password</Label>
         <Input 
+          disabled={isLoading}
           placeholder="Email....."
           value={input.password}
           onChangeText={handleChange('password')}
@@ -139,7 +142,7 @@ console.log(input)
       </Item>
         <Button  onPress={handleSubmit} style={{backgroundColor:'#ff826e',justifyContent:'center',marginTop:20,
         alignItems:'center',}}>
-          <Text style={{fontWeight:'bold'}}>Sign in</Text>
+           {isLoading ? <Spinner color='#FFEB00' /> : <Text style={{fontWeight:'bold'}}>Sign in</Text>}
         </Button>
         <View style={{alignItems:'center'}}>
           <TouchableOpacity onPress={()=>props.navigation.navigate('Register')}>

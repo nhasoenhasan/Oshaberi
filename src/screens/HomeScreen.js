@@ -1,4 +1,5 @@
 import React,{useState,useEffect} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   StyleSheet,
   View,
@@ -42,28 +43,46 @@ export default function HomeScreen(props) {
         },
     }); 
 
+
+    const isLoading = useSelector(state => state.loading.isLoading);
+    const Profiluser = useSelector(state => state.user.user);
+    const dispatch = useDispatch();
+
+    
    
     //Get All Users
     const getAllUser = async() => {
-        const value = await AsyncStorage.getItem('id');
 
-        Db.ref('users').on('value', result => {
-          let data = result.val();
-          if (data !== null) {
-            let allusers = Object.values(data);
-            const filteredUser = allusers.filter(
-                user => user.id !== value,
-            );
-             setUsers({users,userslist:filteredUser});
-          }
+        if(typeof Profiluser.id !== "undefined"){ 
+            Db.ref('users').on('value', result => {
+            let data = result.val();
+            if (data !== null) {
+                let allusers = Object.values(data);
+                const filteredUser = allusers.filter(
+                    users => users.id !== Profiluser.id,
+                );
+                setUsers({users,userslist:filteredUser});
+            }
 
-        });
+            });
+        }   
     };
 
     //Action Get All Users
     useEffect( ()=>{
-        getAllUser()
-    },[])
+        if(typeof Profiluser.id !== "undefined"){ 
+            Db.ref('users').on('value', result => {
+                let data = result.val();
+                if (data !== null) {
+                    let allusers = Object.values(data);
+                    const filteredUser = allusers.filter(
+                        users => users.id !== Profiluser.id,
+                    );
+                    setUsers({users,userslist:filteredUser});
+                }
+            });
+        } 
+    },[Profiluser])
 
     renderRow =({item})=>{
         return(

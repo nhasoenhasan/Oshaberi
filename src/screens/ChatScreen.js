@@ -1,4 +1,5 @@
 import React,{useState,useEffect} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {View,Dimensions,Text,SafeAreaView,Keyboard,TextInput,TouchableOpacity,KeyboardAvoidingView} from 'react-native';
 import AuthLoadingScreen from './AuthLoadingScreen';
 import styles from '../constants/styles'
@@ -31,10 +32,11 @@ export default function ChatScreen(props) {
         messageList:[]
     })
 
+    const Profiluser = useSelector(state => state.user.user);
+
     const getMessage=async()=>{
-        const name = await AsyncStorage.getItem('name');
         firebase.database().ref('messages')
-        .child(name)
+        .child(Profiluser.name)
         .child(person.name)
             .on('child_added',(value)=>{
                 setMessageList((prevState)=>{
@@ -94,17 +96,16 @@ export default function ChatScreen(props) {
     }
 
     const sendMessage=async()=>{
-        const name = await AsyncStorage.getItem('name');
         if(person.textMessage.length>0){
-            let msgId=firebase.database().ref('message').child(name).child(person.name).push().key;
+            let msgId=firebase.database().ref('message').child(Profiluser.name).child(person.name).push().key;
             let updates={};
             let message={
                 message:person.textMessage,
                 time:firebase.database.ServerValue.TIMESTAMP,
                 from:person.name
             }
-            updates['messages/'+name+'/'+person.name+'/'+msgId]=message;
-            updates['messages/'+person.name+'/'+ name+'/'+msgId]=message;
+            updates['messages/'+Profiluser.name+'/'+person.name+'/'+msgId]=message;
+            updates['messages/'+person.name+'/'+ Profiluser.name+'/'+msgId]=message;
             firebase.database().ref().update(updates);
             // setPerson({textMessage:''});
             setPerson({ ...person, textMessage: '' });
@@ -112,7 +113,6 @@ export default function ChatScreen(props) {
     }
 
     renderRow=({item})=>{
-        const name = AsyncStorage.getItem('name');
         return(
             <View style={{
                 flexDirection:'row',
