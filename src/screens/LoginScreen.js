@@ -22,41 +22,16 @@ import Geolocation from 'react-native-geolocation-service';
 
 export default function LoginScreen(props) {
   
-  const [input, setInput] = useState({ email: "", password: "",latitude:"",longitude:""});
+  const [input, setInput] = useState({ 
+    email: "", 
+    password: "",
+    latitude:"",
+    longitude:""});
   const isLoading = useSelector(state => state.loading.isLoading);
   const dispatch = useDispatch();
 
   const handleChange = key => val =>{
     setInput({...input,[key]:val}); 
-  }
-
-  const handleSubmit =async () =>{
-      dispatch(setLoading(true))
-      Auth.signInWithEmailAndPassword(input.email.trim(), input.password)
-      .then(async result => {
-    
-        await Db.ref('users/' + result.user.displayName).update({
-          status: 'Fucking Online',
-          latitude:input.longitude,
-          longitude:input.longitude
-        });
-
-        Console.log("HAI")
-        dispatch(setUser(
-          result.user.uid, 
-          result.user.displayName,
-          result.user.email
-        ))
-          
-        props.navigation.navigate('App');
-      })
-      .catch(error => {
-        Toast.show({
-          text: error.message,
-          buttonText: "Okay",
-          type: "danger"
-        })
-      });
   }
 
   // GET LOCATION PERMISSIONS //
@@ -93,21 +68,48 @@ export default function LoginScreen(props) {
     return false;
   };
 
-  useEffect( ()=>{
-    dispatch(setLoading(false))
+  //GET LOCATION
+  const getLocation = async () => {
     if (hasLocationPermission) {
-        Geolocation.getCurrentPosition(
-            (position) => {
-                setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
-            },
-            (error) => {
-                // See error code charts below.
-                console.log(error.code, error.message);
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-        );
+      Geolocation.getCurrentPosition(
+          (position) => {
+              setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
+          },
+          (error) => {
+              // See error code charts below.
+              console.log(error.code, error.message);
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
     }
-},[])
+  }
+
+
+  //SUBMIT FORM
+  const handleSubmit =async () =>{
+    await getLocation()
+    Auth.signInWithEmailAndPassword(input.email.trim(), input.password)
+    .then(async result => {
+        await Db.ref('users/' + result.user.displayName).update({
+          status: 'Fucking Online',
+          latitude:input.latitude,
+          longitude:input.longitude
+        });
+        dispatch(setUser(
+          result.user.uid, 
+          result.user.displayName,
+          result.user.email
+        ))
+        props.navigation.navigate('App');
+      })
+      .catch(error => {
+        Toast.show({
+          text: error.message,
+          buttonText: "Okay",
+          type: "danger"
+        })
+      });
+  }
 
 console.log(input)
   return(

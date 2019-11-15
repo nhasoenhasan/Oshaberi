@@ -48,25 +48,6 @@ export default function HomeScreen(props) {
     const Profiluser = useSelector(state => state.user.user);
     const dispatch = useDispatch();
 
-    
-   
-    //Get All Users
-    const getAllUser = async() => {
-
-        if(typeof Profiluser.id !== "undefined"){ 
-            Db.ref('users').on('value', result => {
-            let data = result.val();
-            if (data !== null) {
-                let allusers = Object.values(data);
-                const filteredUser = allusers.filter(
-                    users => users.id !== Profiluser.id,
-                );
-                setUsers({users,userslist:filteredUser});
-            }
-
-            });
-        }   
-    };
 
     //Action Get All Users
     useEffect( ()=>{

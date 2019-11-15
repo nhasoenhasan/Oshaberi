@@ -34,48 +34,6 @@ export default function RegisterScreen(props) {
     const handleChange = key => val =>{
         setInput({...input,[key]:val}); 
     }
-
-    console.log(input)
-
-  const submitForm =async () =>{
-    Auth.createUserWithEmailAndPassword(input.email.trim(), input.password)
-      .then(async result => {
-
-        let userPro = Auth.currentUser;
-        await userPro.updateProfile({
-          displayName:input.name,
-        });
-
-        console.log("HAI")
-        dispatch(setUser(
-          result.user.uid, 
-          result.user.displayName,
-          result.user.email
-        ))
-
-        //INSERT DATABASE USER
-        await Db.ref('users/' + input.name)
-        .set({
-          id: result.user.uid,
-          name: input.name,
-          email: input.email,
-          password: input.password,
-          latitude:input.longitude,
-          longitude:input.longitude
-          })  
-         
-        props.navigation.navigate('App');
-      })
-      .catch(error => {
-        // Toast.show({
-        //   text: error.message,
-        //   buttonText: "Okay",
-        //   type: "danger"
-        // })
-        console.log(error)
-      });
-  }
-
   // GET LOCATION PERMISSIONS //
   const hasLocationPermission = async () => {
     if (
@@ -108,7 +66,64 @@ export default function RegisterScreen(props) {
     );
     }
     return false;
-};
+  };
+
+  //GET LOCATION
+  const getLocation = async () => {
+    if (hasLocationPermission) {
+      Geolocation.getCurrentPosition(
+          (position) => {
+              setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
+          },
+          (error) => {
+              // See error code charts below.
+              console.log(error.code, error.message);
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
+    }
+  }
+
+  //SUBMIT DATA
+  const submitForm =async () =>{
+    await getLocation()
+    Auth.createUserWithEmailAndPassword(input.email.trim(), input.password)
+      .then(async result => {
+
+        let userPro = Auth.currentUser;
+        await userPro.updateProfile({
+          displayName:input.name,
+        });
+
+        console.log("HAI")
+        dispatch(setUser(
+          result.user.uid, 
+          result.user.displayName,
+          result.user.email
+        ))
+
+        //INSERT DATABASE USER
+        await Db.ref('users/' + input.name)
+        .set({
+          id: result.user.uid,
+          name: input.name,
+          email: input.email,
+          password: input.password,
+          latitude:input.latitude,
+          longitude:input.longitude
+          })  
+         
+        props.navigation.navigate('App');
+      })
+      .catch(error => {
+        Toast.show({
+          text: error.message,
+          buttonText: "Okay",
+          type: "danger"
+        })
+        console.log(error)
+      });
+  }
 
   useEffect( ()=>{
     if (hasLocationPermission) {
