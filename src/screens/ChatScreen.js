@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from 'react';
-import {View,Dimensions,Text,SafeAreaView,TextInput,TouchableOpacity,KeyboardAvoidingView} from 'react-native';
+import {View,Dimensions,Text,SafeAreaView,Keyboard,TextInput,TouchableOpacity,KeyboardAvoidingView} from 'react-native';
 import AuthLoadingScreen from './AuthLoadingScreen';
 import styles from '../constants/styles'
 import User from '../../User';
@@ -23,6 +23,10 @@ export default function ChatScreen(props) {
         textMessage: ''
     })
 
+    const [keyboard, setKeyboard]=useState({
+        keyboardOffset:0
+    })
+
     const [message,setMessageList]=useState({
         messageList:[]
     })
@@ -41,6 +45,34 @@ export default function ChatScreen(props) {
         })
     }
 
+    const keyboardDidShow= event=>{
+        setKeyboard({
+            keyboardOffset:event.endCoordinates.height,
+        })
+    }
+
+    const keyboardDidHide= event =>{
+        setKeyboard({
+            keyboardOffset:0
+        })
+    }
+
+    //KeyBoard Setting
+    useEffect(()=>{
+        const keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow', keyboardDidShow
+          );
+          const keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide', keyboardDidHide
+          );
+      
+          return () => {
+            keyboardDidHideListener.remove();
+            keyboardDidShowListener.remove();
+          };
+    })
+
+    
 
     useEffect(()=>{
         getMessage()
@@ -112,11 +144,16 @@ export default function ChatScreen(props) {
              
             <View style={{flexDirection:'row',alignItems:'center'}}>
                 <Item last>
-                <Input placeholder="Password" 
+                <Input 
+                    style={{
+                        width:'100%',
+                        bottom:keyboard.keyboardOffset
+                    }}
                     value={person.textMessage}
+                    onSubmitEditing={Keyboard.dismiss}
                     onChangeText={handleChange('textMessage')}
                 />
-                <TouchableOpacity onPress={sendMessage} style={{paddingBottom:10,marginLeft:5}}>
+                <TouchableOpacity onPress={sendMessage} style={{paddingBottom:10,marginLeft:5,bottom:keyboard.keyboardOffset}}>
                     <Text style={styles.btnText}>
                         Send
                     </Text>
