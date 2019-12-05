@@ -4,24 +4,24 @@ import {
   View,
   Text,
   SafeAreaView,
-  Alert,
   TouchableOpacity,
   Image
 } from 'react-native';
-import User from '../../User';
 import styles from '../constants/styles';
 import { TextInput  } from 'react-native-gesture-handler';
 import firebase from 'firebase'; 
-import AsyncStorage from '@react-native-community/async-storage';
 import { setUserNull } from '../Redux/actions/user';
-import { Thumbnail,Icon,Button,Toast} from 'native-base';
+import {Button,Toast,Input,Item,Label,Icon,Thumbnail} from 'native-base';
 import {Auth,Db} from '../Config/Config';
+// import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 ProfileScreen.navigationOptions={
     title:'Profile',
     headerStyle: {
         backgroundColor: '#ff826e',
     },
+    
 }
 
 export default function ProfileScreen(props) {
@@ -56,52 +56,43 @@ export default function ProfileScreen(props) {
         props.navigation.navigate('Auth')
     }
 
-    // useEffect( ()=>{
-    //     setInput({...input,name:Profiluser.name})
-    // },[])
-
-
-    console.log(input.name)
     return(
         <View>
         
         <SafeAreaView style={{
-            paddingTop:50,
+            paddingTop:'20%',
             justifyContent:'center',
-            alignItems:'center'
+            alignItems:'center',
+            padding:'15%'
         }}>
             <Image  
                 source={{uri:'https://cdn0.iconfinder.com/data/icons/social-media-network-4/48/male_avatar-512.png'}} 
-                style={{width:125,height:125,borderRadius:100,marginBottom:50}}
+                style={{width:145,height:145,borderRadius:100,marginBottom:'10%'}}
             />
-            <Text style={{
-                fontSize:20
-            }}>
-                {Profiluser.name}
-            </Text>
-            <Text style={{
-                fontSize:17,
-                margin:10,
-                color:'#ff826e'
-            }}>
-                {Profiluser.email}
-            </Text>
-            <TextInput
-                style={styles.input}
-                value={Profiluser.name}
-                onChangeText={handleChange('name')}
-            />
-            <Button success onPress={changeName} style={{padding:20,backgroundColor:'#ffc05f',borderRadius:20}}>
-            <Text>Change Name</Text>
-          </Button>
-            <TouchableOpacity onPress={deleteToken} style={{justifyContent:'center',alignItems:'center'}}>
-                <Text>Logout
-                    <Icon type="FontAwesome" name="sign-in" />
-                </Text>
-            </TouchableOpacity>
+            <Item floatingLabel style={{marginBottom:'10%'}}>
+                 <Label>Name</Label>
+                <Input 
+                    value={Profiluser.name} 
+                    onChangeText={handleChange('name')}
+                />
+                 <Icon name='pencil' type='FontAwesome' style={{fontSize:17}} active />
+            </Item>
+            
+            <Item floatingLabel >
+                 <Label>Email</Label>
+                <Input 
+                    value={Profiluser.email} 
+                />
+                <Icon name='envelope-o' type='FontAwesome' style={{fontSize:17}} active />
+            </Item>
+            <Button danger onPress={deleteToken} style={{marginTop:'10%',width:'100%',justifyContent:'center',backgroundColor:'#ff826e'}}>
+                <Text style={{color:'white',fontWeight:'bold'}}> Logout </Text>
+            </Button>
         </SafeAreaView>
-        <View style={{position:'absolute',marginLeft:'66%',paddingTop:150}}>
-            <Icon type="FontAwesome" name="camera-retro" />
+        <View style={{position:'absolute',marginLeft:'56%',paddingTop:'53%'}}>
+            <TouchableOpacity style={{backgroundColor:'#ff826e',width:47,alignItems:'center',height:45,borderRadius:19,justifyContent:'center'}}>
+                <Icon name="camera" size={30} style={{color:'white'}} />
+            </TouchableOpacity>
         </View>
         </View>
     )

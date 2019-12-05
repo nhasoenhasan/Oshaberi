@@ -1,4 +1,6 @@
-export const setLoading = (isLoading) => ({
-    type : "SET_LOADING",
-    payload : isLoading
-})
+export const  setLoading = (isLoading) => {
+    return {
+        type : "SET_LOADING",
+        payload : isLoading
+    };
+  };

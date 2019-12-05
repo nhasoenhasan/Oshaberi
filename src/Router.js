@@ -1,12 +1,7 @@
 import React,{useState,useEffect} from 'react';
 import {
-  StyleSheet,
-  View,
   Text,
-  TextInput,
   TouchableOpacity,
-  Alert,
-  Image
 } from 'react-native';
 import {Thumbnail} from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -22,10 +17,15 @@ import { createMaterialBottomTabNavigator } from 'react-navigation-material-bott
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
+import { useDispatch, useSelector } from 'react-redux';
+import firebase from 'firebase'; 
+import {Auth,Db} from '../src/Config/Config';
+import { setUserNull } from '../src/Redux/actions/user';
 
 const DashboardTabNavigator = createMaterialTopTabNavigator({
   Message: HomeScreen,
-  Friend:FriendlistScreen},{
+  Friend:FriendlistScreen,
+  Maps:MapsScreen},{
     tabBarOptions: {
       labelStyle: {
         fontSize: 12,
@@ -62,6 +62,11 @@ const AppStack = createStackNavigator({
   },
   Chat: ChatScreen,
   Profile:{screen:ProfileScreen,
+    navigationOptions:({navigation})=>( {
+      headerStyle: {
+        backgroundColor: '#ff826e',
+      }
+    })
   },
 });
 

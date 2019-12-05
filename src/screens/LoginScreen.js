@@ -1,10 +1,9 @@
 import React,{useState,useEffect} from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch} from 'react-redux';
 import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
   ToastAndroid
 } from 'react-native';
 import styles from '../constants/styles';
@@ -12,6 +11,7 @@ import {Auth,Db} from '../Config/Config';
 import logo from '../assets/image/LogoOshaburi.png';
 import { setUser } from '../Redux/actions/user';
 import {Form, Thumbnail,Item, Input, Label,Button,Toast,Spinner } from 'native-base';
+import Geolocation from 'react-native-geolocation-service';
 
 export default function LoginScreen(props) {
   
@@ -20,7 +20,6 @@ export default function LoginScreen(props) {
     password: "",
     latitude:"",
     longitude:""});
-  // const isLoading = useSelector(state => state.loading.isLoading);
   const dispatch = useDispatch();
   const [isLoading,setLoading]=useState(false);
 
@@ -28,19 +27,22 @@ export default function LoginScreen(props) {
     setInput({...input,[key]:val}); 
   }
 
-  //SUBMIT FORM
+  //SUBMIT FORMs
   const handleSubmit =async () =>{
-    // await getLocation()
     setLoading(true);
     Auth.signInWithEmailAndPassword(input.email.trim(), input.password)
     .then(async result => {
         await Db.ref('users/' + result.user.displayName).update({
           status: 'Online',
+          latitude:input.latitude,
+          longitude:input.longitude
         });
         dispatch(setUser(
           result.user.uid, 
           result.user.displayName,
-          result.user.email
+          result.user.email,
+          input.latitude,
+          input.longitude
         ))
         setLoading(false)
         props.navigation.navigate('App');
@@ -55,6 +57,55 @@ export default function LoginScreen(props) {
       });
   }
 
+  // // GET LOCATION PERMISSIONS //
+  const hasLocationPermission = async () => {
+    if (
+    Platform.OS === 'ios' ||
+    (Platform.OS === 'android' && Platform.Version < 23)
+    ) {
+    return true;
+    }
+    const hasPermission = await PermissionsAndroid.check(
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (hasPermission) {
+    return true;
+    }
+    const status = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (status === PermissionsAndroid.RESULTS.GRANTED) {
+    return true;
+    }
+    if (status === PermissionsAndroid.RESULTS.DENIED) {
+    ToastAndroid.show(
+        'Location Permission Denied By User.',
+        ToastAndroid.LONG,
+    );
+    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+    ToastAndroid.show(
+        'Location Permission Revoked By User.',
+        ToastAndroid.LONG,
+    );
+    }
+    return false;
+  };
+
+  useEffect( ()=>{
+    if (hasLocationPermission) {
+        Geolocation.getCurrentPosition(
+            (position) => {
+                setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
+            },
+            (error) => {
+                // See error code charts below.
+                console.log(error.code, error.message);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
+    }
+},[])
+console.log(input)
   return(
     <View style={styles.containerSignin}>
     <Form>

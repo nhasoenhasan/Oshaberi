@@ -4,6 +4,7 @@ import { name } from '../../../app.json';
 import AsyncStorage from '@react-native-community/async-storage';
 import loading from './loading';
 import user from './user';
+import userlist from './userlist';
 
 const persistConfig = {
     key: name,
@@ -11,7 +12,8 @@ const persistConfig = {
 }
 
 const reducers = combineReducers({
-    loading: loading,
+    loading,
+    userlist,
     user: persistReducer(persistConfig, user)
 })
 
