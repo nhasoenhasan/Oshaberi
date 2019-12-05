@@ -9,12 +9,18 @@ import {Auth,Db} from '../Config/Config';
 import firebase from 'firebase';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Item, Input } from 'native-base';
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
 
 ChatScreen.navigationOptions=({navigation})=>{
+    
     return{
-        title:navigation.getParam('name',null)
+        title:navigation.getParam('name',null),
+        headerStyle: {
+            backgroundColor: '#ff826e',
+        }
     }
 }
+
 
 export default function ChatScreen(props) {
     // const [Message, setMessage] = useState({ textMessage: ''});
@@ -118,7 +124,7 @@ export default function ChatScreen(props) {
                 flexDirection:'row',
                 width:'60%',
                 alignSelf:item.from==person.name?'flex-end':'flex-start',
-                backgroundColor:item.from===person.name?'#00897b':'#7cb324',
+                backgroundColor:item.from===person.name?'#3096e1':'#ffc05f',
                 borderRadius:5,
                 marginBottom:10 
             }}>
@@ -147,15 +153,19 @@ export default function ChatScreen(props) {
                 <Input 
                     style={{
                         width:'100%',
-                        bottom:keyboard.keyboardOffset
+                        bottom:keyboard.keyboardOffset,
+                        backgroundColor:'white',
+                        borderWidth:1,
+                        borderColor:'#ccc',
+                        borderRadius:15
                     }}
                     value={person.textMessage}
                     onSubmitEditing={Keyboard.dismiss}
                     onChangeText={handleChange('textMessage')}
                 />
-                <TouchableOpacity onPress={sendMessage} style={{paddingBottom:10,marginLeft:5,bottom:keyboard.keyboardOffset}}>
+                <TouchableOpacity onPress={sendMessage} style={{paddingBottom:10,marginLeft:5,marginRight:20,bottom:keyboard.keyboardOffset}}>
                     <Text style={styles.btnText}>
-                        Send
+                    <Icon type="FontAwesome" size={20} name="send" />
                     </Text>
                 </TouchableOpacity>
                 </Item>

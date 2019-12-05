@@ -1,20 +1,14 @@
 import React,{useState,useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  StyleSheet,
   View,
   Text,
-  TextInput,
   TouchableOpacity,
-  Alert,
+  ToastAndroid,
 } from 'react-native';
 import {Auth,Db} from '../Config/Config';
-import User from '../../User';
-import AsyncStorage from '@react-native-community/async-storage';
-import styles from '../constants/styles';
-import firebase from 'firebase';
 import logo from '../assets/image/LogoOshaburi.png';
-import {Form, Item, Input, Label,Button,Thumbnail,Toast } from 'native-base';
+import {Item, Input, Label,Button,Thumbnail,Spinner} from 'native-base';
 import Geolocation from 'react-native-geolocation-service';
 import { setUser } from '../Redux/actions/user';
 
@@ -28,13 +22,13 @@ export default function RegisterScreen(props) {
       latitude:"",
       longitude:""
     });
-    const isLoading = useSelector(state => state.loading.isLoading);
+    const[isLoading,setLoading]=useState(false);
     const dispatch = useDispatch();
 
     const handleChange = key => val =>{
         setInput({...input,[key]:val}); 
     }
-  // GET LOCATION PERMISSIONS //
+  // // GET LOCATION PERMISSIONS //
   const hasLocationPermission = async () => {
     if (
     Platform.OS === 'ios' ||
@@ -68,25 +62,25 @@ export default function RegisterScreen(props) {
     return false;
   };
 
-  //GET LOCATION
-  const getLocation = async () => {
-    if (hasLocationPermission) {
-      Geolocation.getCurrentPosition(
-          (position) => {
-              setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
-          },
-          (error) => {
-              // See error code charts below.
-              console.log(error.code, error.message);
-          },
-          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
-    }
-  }
+  // //GET LOCATION
+  // const getLocation = async () => {
+  //   if (hasLocationPermission) {
+  //     Geolocation.getCurrentPosition(
+  //         (position) => {
+  //             setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
+  //         },
+  //         (error) => {
+  //             // See error code charts below.
+  //             console.log(error.code, error.message);
+  //         },
+  //         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+  //     );
+  //   }
+  // }
 
   //SUBMIT DATA
   const submitForm =async () =>{
-    await getLocation()
+    setLoading(true);
     Auth.createUserWithEmailAndPassword(input.email.trim(), input.password)
       .then(async result => {
 
@@ -110,18 +104,19 @@ export default function RegisterScreen(props) {
           email: input.email,
           password: input.password,
           latitude:input.latitude,
-          longitude:input.longitude
+          longitude:input.longitude,
+          status:'Online'
           })  
-         
+        setLoading(false)
         props.navigation.navigate('App');
       })
       .catch(error => {
-        Toast.show({
-          text: error.message,
-          buttonText: "Okay",
-          type: "danger"
-        })
-        console.log(error)
+        setLoading(false)
+        ToastAndroid.showWithGravity(
+          error.message,
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
       });
   }
 
@@ -156,6 +151,7 @@ export default function RegisterScreen(props) {
         <Input 
           value={input.name}
           onChangeText={handleChange('name')}
+          disabled={isLoading}
         />
       </Item>
       <Item floatingLabel style={{marginBottom:6}}>
@@ -163,6 +159,7 @@ export default function RegisterScreen(props) {
         <Input 
           value={input.email}
           onChangeText={handleChange('email')}
+          disabled={isLoading}
         />
       </Item>
       <Item floatingLabel style={{marginBottom:6}}>
@@ -170,14 +167,13 @@ export default function RegisterScreen(props) {
         <Input 
           secureTextEntry={true}
           value={input.password}
+          disabled={isLoading}
           onChangeText={handleChange('password')}
         />
       </Item>
       <Button  onPress={submitForm} style={{backgroundColor:'#ff826e',justifyContent:'center',marginTop:20,
         alignItems:'center',}}>
-          <Text style={{fontWeight:'bold'}}>
-            Register
-          </Text>
+          {isLoading?<Spinner color='#FFEB00' />:<Text style={{fontWeight:'bold'}}>Register</Text>}
         </Button>
         <View style={{alignItems:'center'}}>
           <TouchableOpacity onPress={()=>props.navigation.navigate('Login')}>

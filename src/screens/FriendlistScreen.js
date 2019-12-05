@@ -15,9 +15,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 import firebase from 'firebase';
 import {Auth,Db} from '../Config/Config';
 
- 
 
-export default function HomeScreen(props) {
+export default function FriendlistScreen(props) {
 
     const [users, setUsers] = useState({ 
         userslist: [],
@@ -37,23 +36,21 @@ export default function HomeScreen(props) {
     const Profiluser = useSelector(state => state.user.user);
     const dispatch = useDispatch();
 
-    const fetchddata=async()=>{
-        await Db.ref('users').on('value', result => {
-            let data = result.val();
-            if (data !== null) {
-                let allusers = Object.values(data);
-                const filteredUser = allusers.filter(
-                    users => users.id !== Profiluser.id,
-                );
-                setUsers({users,userslist:filteredUser});
-            }
-        });
-    }
-
 
     //Action Get All Users
     useEffect( ()=>{
-        fetchddata()
+        if(typeof Profiluser.id !== "undefined"){ 
+            Db.ref('users').on('value', result => {
+                let data = result.val();
+                if (data !== null) {
+                    let allusers = Object.values(data);
+                    const filteredUser = allusers.filter(
+                        users => users.id !== Profiluser.id,
+                    );
+                    setUsers({users,userslist:filteredUser});
+                }
+            });
+        } 
     },[Profiluser])
 
     renderRow =({item})=>{
@@ -61,7 +58,7 @@ export default function HomeScreen(props) {
             <TouchableOpacity 
                 onPress={()=>props.navigation.navigate('Chat',item)}
                 style={{padding:10,borderBottomColor:'#ffc05f',borderBottomWidth:2}}>
-                <View style={{flex: 1, flexDirection: 'row',justifyContent:'space-between'}}>
+               <View style={{flex: 1, flexDirection: 'row',justifyContent:'space-between'}}>
                 <View>
                     <Text style={{fontSize:18}}>
                         {item.name}
