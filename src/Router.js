@@ -1,10 +1,9 @@
-import React,{useState,useEffect} from 'react';
+import React from 'react';
 import {
   Text,
   TouchableOpacity,
 } from 'react-native';
 import {Thumbnail} from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import AuthLoadingScreen from './screens/AuthLoadingScreen';
@@ -13,18 +12,14 @@ import RegisterScreen from './screens/RegisterScreen';
 import ChatScreen from './screens/ChatScreen';
 import MapsScreen from './screens/MapsScreen';
 import FriendlistScreen from './screens/FriendlistScreen';
-import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
-import { useDispatch, useSelector } from 'react-redux';
-import firebase from 'firebase'; 
-import {Auth,Db} from '../src/Config/Config';
-import { setUserNull } from '../src/Redux/actions/user';
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
 
 const DashboardTabNavigator = createMaterialTopTabNavigator({
-  Message: HomeScreen,
-  Friend:FriendlistScreen,
+  Friends: HomeScreen,
+  // Friend:FriendlistScreen,
   Maps:MapsScreen},{
     tabBarOptions: {
       labelStyle: {
@@ -46,19 +41,19 @@ const DashboardTabNavigator = createMaterialTopTabNavigator({
 const AppStack = createStackNavigator({ 
   Dashboard:{screen:DashboardTabNavigator,
     navigationOptions:({navigation})=>( {
+      headerTitle:()=>(
+        <Text style={{marginHorizontal:'6%',fontSize:20,color:'white',fontWeight:'bold'}}>Oshaberi</Text>
+      ),
       headerStyle: {
         backgroundColor: '#ff826e',
       },
       headerRight:(
       <TouchableOpacity onPress={()=>navigation.navigate('Profile')}>
-          <Thumbnail 
-          small 
-          source={{uri: 'https://cdn0.iconfinder.com/data/icons/social-media-network-4/48/male_avatar-512.png'}}
-          style={{marginRight:10}}
-          />
+          <Icon type="FontAwesome"  size={20} name="gear" style={{paddingRight:20,color:'white'}}  />
       </TouchableOpacity>
       )
     })
+    
   },
   Chat: ChatScreen,
   Profile:{screen:ProfileScreen,

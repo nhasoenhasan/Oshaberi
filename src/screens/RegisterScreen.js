@@ -96,7 +96,9 @@ export default function RegisterScreen(props) {
           result.user.uid, 
           result.user.displayName,
           result.user.email,
-          input.image
+          input.image,
+          input.latitude,
+          input.longitude
         ))
 
         //INSERT DATABASE USER
@@ -124,25 +126,27 @@ export default function RegisterScreen(props) {
       });
   }
 
-  useEffect( ()=>{
+  const getLocation=()=>{
     if (hasLocationPermission) {
-        Geolocation.getCurrentPosition(
-            (position) => {
-                setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
-            },
-            (error) => {
-                // See error code charts below.
-                console.log(error.code, error.message);
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-        );
+      Geolocation.getCurrentPosition(
+          (position) => {
+              setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
+          },
+          (error) => {
+              // See error code charts below.
+              console.log(error.code, error.message);
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
     }
-
-    return () => {
-      Geolocation.clearWatch();
-      Geolocation.stopObserving();
   }
-},[])
+
+  useEffect( ()=>{
+    getLocation()
+
+  },[])
+
+  console.log('REGISTER-----------------',input)
 
   return(
     <View style={{padding:40,paddingTop:20}}>

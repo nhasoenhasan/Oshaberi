@@ -6,7 +6,8 @@ import {
   SafeAreaView,
   Alert,
   TouchableOpacity,
-  ToastAndroid
+  ToastAndroid,
+  Image
 } from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
@@ -19,21 +20,17 @@ export default function MapsScreen(props) {
 
     //SET STATE
     const userslist = useSelector(state => state.userlist.userlist);
-    const latitude=useSelector(state=>state.user.latitude)
-    const l=useSelector(state=>state.user.longitude)
+    
 
-     //Get All Userss
-     const getAllUser = async() => {
-        await getLocation()
-    };
+    const Profiluser = useSelector(state => state.user.user);
+    console.log('PROFILE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',Profiluser)
 
     return(
-    <>
         <MapView
-            style={{ flex: 1, width: window.width }} //window pake Dimensions
+            style={{ flex: 1, width: window.width }}
             region={{
-                latitude:-7.5983209,
-                longitude: 110.4792318,
+                latitude: Profiluser.latitude||-7.755322,
+                longitude: Profiluser.longitude||110.381174,
                 latitudeDelta: 0.0922,
                 longitudeDelta: 0.0421 
             }}         
@@ -49,7 +46,7 @@ export default function MapsScreen(props) {
             >
             {userslist.map((item)=>{
                 return(
-                <MapView.Marker
+                <Marker
                 key = {item.id}
                 coordinate={{
                     latitude: item.latitude||0,
@@ -57,10 +54,18 @@ export default function MapsScreen(props) {
                 }}
                 title={item.name} 
                 description={item.name}
-                />
+                >
+                 <Text
+                key={item.id}
+                 >{item.name}</Text>
+                <Image
+                     key={item.id}
+                      source={{uri: item.image}}
+                      style={{width: 40, height: 40, borderRadius: 50}}
+                    /> 
+                </Marker>
                 )})} 
         </MapView>
-     </>
     )
 
 }

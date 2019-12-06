@@ -8,16 +8,32 @@ import { FlatList } from 'react-native-gesture-handler';
 import {Auth,Db} from '../Config/Config';
 import firebase from 'firebase';
 import AsyncStorage from '@react-native-community/async-storage';
-import {Item, Input } from 'native-base';
+import {Item, Thumbnail } from 'native-base';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 
 ChatScreen.navigationOptions=({navigation})=>{
     
     return{
-        title:navigation.getParam('name',null),
+        headerTitle:()=>(
+            <View style={{marginLeft:20}}>
+                <Text style={{fontSize:20,color:'white'}}>{navigation.getParam('name',null)}</Text>
+                {navigation.getParam('status',null)==='Offline'?
+                    <Text style={{fontSize:13,fontWeight:'500',color:'red'}}>{navigation.getParam('status',null)}</Text>
+                :
+                    <Text style={{fontSize:13,fontWeight:'500',color:'green'}}>{navigation.getParam('status',null)}</Text>
+                }
+            </View>
+        ),
         headerStyle: {
             backgroundColor: '#ff826e',
-        }
+        },
+        headerLeft:()=>(
+                <Thumbnail 
+                small 
+                source={{uri: navigation.getParam('image',null)}}
+                style={{marginLeft:20}}
+                />
+        )
     }
 }
 
@@ -42,7 +58,7 @@ export default function ChatScreen(props) {
 
     const getMessage=async()=>{
         firebase.database().ref('messages')
-        .child(Profiluser.name)
+        .child(Profiluser.id)
         .child(person.name)
             .on('child_added',(value)=>{
                 setMessageList((prevState)=>{
@@ -103,15 +119,15 @@ export default function ChatScreen(props) {
 
     const sendMessage=async()=>{
         if(person.textMessage.length>0){
-            let msgId=firebase.database().ref('message').child(Profiluser.name).child(person.name).push().key;
+            let msgId=firebase.database().ref('message').child(Profiluser.id).child(person.name).push().key;
             let updates={};
             let message={
                 message:person.textMessage,
                 time:firebase.database.ServerValue.TIMESTAMP,
                 from:person.name
             }
-            updates['messages/'+Profiluser.name+'/'+person.name+'/'+msgId]=message;
-            updates['messages/'+person.name+'/'+ Profiluser.name+'/'+msgId]=message;
+            updates['messages/'+Profiluser.id+'/'+person.name+'/'+msgId]=message;
+            updates['messages/'+person.id+'/'+ Profiluser.name+'/'+msgId]=message;
             firebase.database().ref().update(updates);
             // setPerson({textMessage:''});
             setPerson({ ...person, textMessage: '' });
@@ -149,26 +165,24 @@ export default function ChatScreen(props) {
             />
              
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Item last>
-                <Input 
+                <TextInput 
                     style={{
-                        width:'100%',
+                        width:280,
                         bottom:keyboard.keyboardOffset,
                         backgroundColor:'white',
                         borderWidth:1,
                         borderColor:'#ccc',
-                        borderRadius:15
+                        borderRadius:20
                     }}
                     value={person.textMessage}
                     onSubmitEditing={Keyboard.dismiss}
                     onChangeText={handleChange('textMessage')}
                 />
-                <TouchableOpacity onPress={sendMessage} style={{paddingBottom:10,marginLeft:5,marginRight:20,bottom:keyboard.keyboardOffset}}>
-                    <Text style={styles.btnText}>
-                    <Icon type="FontAwesome" size={20} name="send" />
-                    </Text>
+                <TouchableOpacity onPress={sendMessage} style={{backgroundColor:'#ff826e',borderRadius:20,width:50,height:45,marginLeft:12,alignItems:'center',bottom:keyboard.keyboardOffset}} >
+                    
+                    <Icon type="FontAwesome"  size={25} name="send" style={{padding:9,color:'white'}}  />
+                    
                 </TouchableOpacity>
-                </Item>
             </View>
         </SafeAreaView>
     )

@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {Auth,Db} from '../Config/Config';
 import {setUserlist} from '../Redux/actions/userlist';
-
+import {Thumbnail} from 'native-base'
  
 
 export default function HomeScreen(props) {
@@ -41,26 +41,62 @@ export default function HomeScreen(props) {
         });
     }
 
+    // const fetchdataMessage=async()=>{
+
+    //     await Db.ref('messages')
+    //           .on('value', result => {
+    //         let data = result.val();
+    //          if (data !== null) {
+    //              let allusers = Object.values(data);
+    //             console.log
+    //              let filteredUsermessage = allusers.filter(
+    //                 users => Object.keys(users) !== Profiluser.id,
+    //             );
+    //             console.log('PESAn terfilter',Object(Object.keys(filteredUsermessage[0])))
+    //         }
+            
+    //     });
+    // }
+
     useEffect( ()=>{
         fetchddata()
     },[Profiluser])
+
+    // useEffect( ()=>{
+    //     fetchdataMessage()
+    // },[Profiluser])
 
     renderRow =({item})=>{
         return(
             <TouchableOpacity 
                 onPress={()=>props.navigation.navigate('Chat',item)}
                 style={{padding:10,borderBottomColor:'#ffc05f',borderBottomWidth:2}}>
-                <View style={{flex: 1, flexDirection: 'row',justifyContent:'space-between'}}>
-                <View>
-                    <Text style={{fontSize:18}}>
-                        {item.name}
-                    </Text>
-                </View>
-                <View style={{justifyContent:'flex-end',flexDirection:'column',}}>
-                    <Text style={{fontSize:12}}>
-                        {item.status}
-                    </Text>
-                </View>
+                <View style={{flex: 1, flexDirection: 'row',alignItems:'center'}}>
+                
+                    <View >
+                        <Thumbnail 
+                        small 
+                        source={{uri:item.image}}
+                        style={{marginRight:20}}
+                        />
+                    </View>
+                    <View style={{width:'70%'}}>
+                        <Text style={{fontSize:18}}>
+                            {item.name}
+                        </Text>
+                    </View>
+                    <View >
+                        {item.status==='Offline'?
+                            <Text style={{fontSize:12,color:'red'}}>
+                                {item.status}
+                            </Text>
+                        :
+                            <Text style={{fontSize:12,color:'green'}}>
+                                {item.status}
+                            </Text>
+                        }
+                        
+                    </View>
 
                 </View>
             </TouchableOpacity>

@@ -1,6 +1,6 @@
-export const setUser = (id, name, email,image) => ({
+export const setUser = (id, name, email,image,latitude,longitude) => ({
     type : "SET_USER",
-    payload : {id, name, email,image}
+    payload : {id, name, email,image,latitude,longitude}
 })
 
 export const setUserNull = () => ({

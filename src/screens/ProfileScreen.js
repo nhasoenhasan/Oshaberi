@@ -18,7 +18,9 @@ import { setUser } from '../Redux/actions/user';
 
 
 ProfileScreen.navigationOptions={
-    title:'Profile',
+    headerTitle:()=>(
+        <Text style={{fontSize:25,color:'white'}}>Profile</Text>
+    ),
     headerStyle: {
         backgroundColor: '#ff826e',
     },
@@ -149,17 +151,18 @@ export default function ProfileScreen(props) {
             
                 
                 {uploadingImage ? 
-                <Spinner color='#ff826e' style={{width:145,height:145,borderRadius:100,marginBottom:'10%',borderColor:'#ff826es'}} /> 
+                <Spinner color='#ff826e' style={{width:145,height:145,borderRadius:100,marginBottom:'10%'}} /> 
                 : 
                 <Image 
                         source={{uri:Profiluser.image}} 
-                        style={{width:145,height:145,borderRadius:100,marginBottom:'10%',borderColor:'#ff826es'}}
+                        style={{width:145,height:145,borderRadius:100,marginBottom:'10%'}}
                 />}
             <Item floatingLabel style={{marginBottom:'10%'}}>
                  <Label>Name</Label>
                 <Input 
                     value={Profiluser.name} 
                     onChangeText={handleChange('name')}
+                    disabled={true}
                 />
                  <Icon name='pencil' type='FontAwesome' style={{fontSize:17}} active />
             </Item>
@@ -168,6 +171,7 @@ export default function ProfileScreen(props) {
                  <Label>Email</Label>
                 <Input 
                     value={Profiluser.email} 
+                    disabled={true}
                     />
                 <Icon name='envelope-o' type='FontAwesome' style={{fontSize:17}} active />
             </Item>

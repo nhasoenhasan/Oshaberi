@@ -18,11 +18,6 @@ import {Auth,Db} from '../Config/Config';
 
 export default function FriendlistScreen(props) {
 
-    const [users, setUsers] = useState({ 
-        userslist: [],
-        id: '',
-    });
-
     const styles = StyleSheet.create({
         container:{
           flex:1,
@@ -30,28 +25,7 @@ export default function FriendlistScreen(props) {
           alignItems:'center'
         },
     }); 
-
-
-    const isLoading = useSelector(state => state.loading.isLoading);
-    const Profiluser = useSelector(state => state.user.user);
-    const dispatch = useDispatch();
-
-
-    //Action Get All Users
-    useEffect( ()=>{
-        if(typeof Profiluser.id !== "undefined"){ 
-            Db.ref('users').on('value', result => {
-                let data = result.val();
-                if (data !== null) {
-                    let allusers = Object.values(data);
-                    const filteredUser = allusers.filter(
-                        users => users.id !== Profiluser.id,
-                    );
-                    setUsers({users,userslist:filteredUser});
-                }
-            });
-        } 
-    },[Profiluser])
+    const userslist = useSelector(state => state.userlist.userlist);
 
     renderRow =({item})=>{
         return(
@@ -79,7 +53,7 @@ export default function FriendlistScreen(props) {
     return(
         <SafeAreaView>
             <FlatList
-                data={users.userslist}
+                data={userslist}
                 renderItem={renderRow}
                 keyExtractor={(item)=>item.id}
             />

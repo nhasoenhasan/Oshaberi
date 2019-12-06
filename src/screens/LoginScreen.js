@@ -47,7 +47,9 @@ export default function LoginScreen(props) {
               result.user.uid, 
               result.user.displayName,
               result.user.email,
-              data.image
+              data.image,
+              input.latitude,
+              input.longitude
             ))
           }
         });
@@ -100,7 +102,7 @@ export default function LoginScreen(props) {
     return false;
   };
 
-  useEffect( ()=>{
+  const getLocation=()=>{
     if (hasLocationPermission) {
       Geolocation.getCurrentPosition(
           (position) => {
@@ -113,12 +115,12 @@ export default function LoginScreen(props) {
           { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
       );
     }
+  }
 
-    return () => {
-      Geolocation.clearWatch();
-      Geolocation.stopObserving();
-    }
-},[])
+  useEffect(()=>{
+    getLocation()
+
+  },[])
 console.log(input)
   return(
     <View style={styles.containerSignin}>
