@@ -20,7 +20,8 @@ export default function RegisterScreen(props) {
       password:"",
       errorMessage: null,
       latitude:"",
-      longitude:""
+      longitude:"",
+      image:'https://instagram.fjog4-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/p640x640/66848054_377267772989547_936657195725962670_n.jpg?_nc_ht=instagram.fjog4-1.fna.fbcdn.net&_nc_cat=103&oh=6a72311daf20ea257c467186403165cb&oe=5E80C8CF'
     });
     const[isLoading,setLoading]=useState(false);
     const dispatch = useDispatch();
@@ -78,6 +79,7 @@ export default function RegisterScreen(props) {
   //   }
   // }
 
+  
   //SUBMIT DATA
   const submitForm =async () =>{
     setLoading(true);
@@ -87,13 +89,14 @@ export default function RegisterScreen(props) {
         let userPro = Auth.currentUser;
         await userPro.updateProfile({
           displayName:input.name,
+          photoURL:input.image
         });
 
-        console.log("HAI")
         dispatch(setUser(
           result.user.uid, 
           result.user.displayName,
-          result.user.email
+          result.user.email,
+          input.image
         ))
 
         //INSERT DATABASE USER
@@ -105,6 +108,7 @@ export default function RegisterScreen(props) {
           password: input.password,
           latitude:input.latitude,
           longitude:input.longitude,
+          image:input.image,
           status:'Online'
           })  
         setLoading(false)
@@ -133,6 +137,11 @@ export default function RegisterScreen(props) {
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
         );
     }
+
+    return () => {
+      Geolocation.clearWatch();
+      Geolocation.stopObserving();
+  }
 },[])
 
   return(

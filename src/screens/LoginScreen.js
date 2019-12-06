@@ -32,18 +32,27 @@ export default function LoginScreen(props) {
     setLoading(true);
     Auth.signInWithEmailAndPassword(input.email.trim(), input.password)
     .then(async result => {
+        //Update Data Realtime
         await Db.ref('users/' + result.user.displayName).update({
           status: 'Online',
           latitude:input.latitude,
           longitude:input.longitude
         });
-        dispatch(setUser(
-          result.user.uid, 
-          result.user.displayName,
-          result.user.email,
-          input.latitude,
-          input.longitude
-        ))
+
+        //Get Image
+        await Db.ref('users/'+result.user.displayName).on('value', profile => {
+          let data = profile.val();
+           if (data !== null) {
+            dispatch(setUser(
+              result.user.uid, 
+              result.user.displayName,
+              result.user.email,
+              data.image
+            ))
+          }
+        });
+        
+       
         setLoading(false)
         props.navigation.navigate('App');
       })
@@ -93,16 +102,21 @@ export default function LoginScreen(props) {
 
   useEffect( ()=>{
     if (hasLocationPermission) {
-        Geolocation.getCurrentPosition(
-            (position) => {
-                setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
-            },
-            (error) => {
-                // See error code charts below.
-                console.log(error.code, error.message);
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-        );
+      Geolocation.getCurrentPosition(
+          (position) => {
+              setInput({...input,latitude:position.coords.latitude,longitude:position.coords.longitude}); 
+          },
+          (error) => {
+              // See error code charts below.
+              console.log(error.code, error.message);
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
+    }
+
+    return () => {
+      Geolocation.clearWatch();
+      Geolocation.stopObserving();
     }
 },[])
 console.log(input)
