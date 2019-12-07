@@ -5,7 +5,6 @@ const initialState = {
 const userReducer = (state = initialState ,action) => {
     switch (action.type) {
         case "SET_USER" :
-            console.log("REDUCERS DATA",action.payload)
             return {
                 ...state,
                 user : action.payload

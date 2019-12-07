@@ -9,11 +9,6 @@ import {
   SafeAreaView ,
   Image
 } from 'react-native';
-import User from '../../User';
-import styles from '../constants/styles'; 
-import AsyncStorage from '@react-native-community/async-storage';
-import firebase from 'firebase';
-import {Auth,Db} from '../Config/Config';
 
 
 export default function FriendlistScreen(props) {

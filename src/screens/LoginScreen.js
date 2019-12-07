@@ -121,7 +121,6 @@ export default function LoginScreen(props) {
     getLocation()
 
   },[])
-console.log(input)
   return(
     <View style={styles.containerSignin}>
     <Form>

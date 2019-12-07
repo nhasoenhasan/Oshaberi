@@ -23,7 +23,6 @@ export default function MapsScreen(props) {
     
 
     const Profiluser = useSelector(state => state.user.user);
-    console.log('PROFILE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',Profiluser)
 
     return(
         <MapView
@@ -56,10 +55,10 @@ export default function MapsScreen(props) {
                 description={item.name}
                 >
                  <Text
-                key={item.id}
+               
                  >{item.name}</Text>
                 <Image
-                     key={item.id}
+                     
                       source={{uri: item.image}}
                       style={{width: 40, height: 40, borderRadius: 50}}
                     /> 

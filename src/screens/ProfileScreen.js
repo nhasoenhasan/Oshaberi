@@ -126,7 +126,7 @@ export default function ProfileScreen(props) {
         return fileupload
     }
 
-    console.log('>>>>',Profiluser.image)
+   
     
     return(
         <View>

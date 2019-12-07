@@ -21,7 +21,7 @@ export default function RegisterScreen(props) {
       errorMessage: null,
       latitude:"",
       longitude:"",
-      image:'https://instagram.fjog4-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/p640x640/66848054_377267772989547_936657195725962670_n.jpg?_nc_ht=instagram.fjog4-1.fna.fbcdn.net&_nc_cat=103&oh=6a72311daf20ea257c467186403165cb&oe=5E80C8CF'
+      image:'https://pbs.twimg.com/profile_images/1171157788673769472/qPMsg_hw_400x400.jpg'
     });
     const[isLoading,setLoading]=useState(false);
     const dispatch = useDispatch();
@@ -146,7 +146,7 @@ export default function RegisterScreen(props) {
 
   },[])
 
-  console.log('REGISTER-----------------',input)
+  
 
   return(
     <View style={{padding:40,paddingTop:20}}>
