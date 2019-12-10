@@ -20,7 +20,7 @@
 * And others
 
 ## How to Install
-1. Download / clone this project or you can type `https://github.com/nhasoenhasan/Oshaberi`
+1. Download / clone this project or you can type `https://github.com/nhasoenhasan/Oshabiru`
 2. Open app's directory in CMD or Terminal
 3. Install node modules with type `npm install` or `yarn install`
 4. Run App with type `react-native run-android`
