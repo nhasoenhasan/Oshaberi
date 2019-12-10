@@ -26,7 +26,7 @@
 4. Run App with type `react-native run-android`
 
 ## Download the APK (Oshabiru)
-You can Download the APK [`here`](https://drive.google.com/drive/folders/1iGlYjoSAnB0DwigOpWpgvdKQu0M9Eklb?usp=sharing)
+You can Download the APK [`here`](https://drive.google.com/drive/folders/1SP6ZsmB4RZs9RE43zDL1lMTVgNxsD6c4?usp=sharing)
 
 ## Screenshot from the App
 <p align='center'>
